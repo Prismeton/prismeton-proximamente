@@ -143,46 +143,52 @@ function setLanguage(code) {
 }
 
 async function initLanguage() {
-    const path = window.location.pathname.replace(/\//g, '').toLowerCase();
-    
-    // Si la URL ya tiene /es, /en o /pt, respetarla (no hacer nada más)
-    if (translations[path]) {
-        applyTranslation(path);
-        return;
-    }
-
-    // SI ESTÁ EN LA RAÍZ (/): Forzar detección por IP
-    console.log("Detectando ubicación para redirección...");
+    console.log("Iniciando detección agresiva de ubicación...");
     
     let countryCode = null;
-
     try {
-        // Intento 1: ipwho.is
-        const res1 = await fetch('https://ipwho.is/').then(r => r.json());
-        if (res1.success) countryCode = res1.country_code;
-        else {
-            // Intento 2: ipapi.co (fallback)
-            const res2 = await fetch('https://ipapi.co/json/').then(r => r.json());
-            countryCode = res2.country_code;
+        // Cache-busting para detectar cambios de red/VPN en tiempo real
+        const response = await fetch(`https://ipwho.is/?_=${Date.now()}`);
+        const data = await response.json();
+        if (data && data.success) {
+            countryCode = data.country_code;
         }
     } catch (e) {
-        console.warn("Detección IP fallida:", e);
+        console.warn("Fallo ipwho.is, intentando ipapi.co...");
+        try {
+            const fallback = await fetch('https://ipapi.co/json/').then(r => r.json());
+            countryCode = fallback.country_code;
+        } catch (e2) {
+            console.error("Fallo total en geolocalización.");
+        }
     }
 
+    const currentPath = window.location.pathname.replace(/\//g, '').toLowerCase();
+    
     if (countryCode) {
         let detected = 'en';
         if (spanishCountries.includes(countryCode)) detected = 'es';
         else if (portugueseCountries.includes(countryCode)) detected = 'pt';
         
-        console.log(`Redirigiendo a /${detected} basado en país: ${countryCode}`);
-        setLanguage(detected);
-        return;
+        console.log(`Ubicación: ${countryCode} | Detectado: ${detected} | URL Actual: /${currentPath}`);
+
+        // REDIRECCIÓN AGRESIVA: Si la IP no coincide con la URL actual, redirigir siempre
+        if (currentPath !== detected) {
+            console.log(`>> Redirección forzada por ubicación: /${detected}`);
+            setLanguage(detected);
+            return;
+        }
     }
 
-    // Si todo lo anterior falla, usar idioma del navegador
-    const browserLang = (navigator.language || navigator.userLanguage).split('-')[0].toLowerCase();
-    const finalLang = translations[browserLang] ? browserLang : 'en';
-    setLanguage(finalLang);
+    // Si ya estamos en la ruta correcta o falló la IP, aplicar traducción
+    if (translations[currentPath]) {
+        applyTranslation(currentPath);
+    } else {
+        // Fallback: Idioma del navegador si estamos en la raíz y falló la IP
+        const browserLang = (navigator.language || navigator.userLanguage).split('-')[0].toLowerCase();
+        const finalLang = translations[browserLang] ? browserLang : 'en';
+        setLanguage(finalLang);
+    }
 }
 
 initLanguage();
