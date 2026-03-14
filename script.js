@@ -97,15 +97,18 @@ animate();
 const translations = {
     'es': {
         title: 'PRÓXIMAMENTE',
-        desc: 'El nuevo estándar en comunicación visual y tecnológica.'
+        desc: 'El nuevo estándar en comunicación visual y tecnológica.',
+        footer: '© 2026 PRISMETON. TODOS LOS DERECHOS RESERVADOS.'
     },
     'en': {
         title: 'COMING SOON',
-        desc: 'The new standard in visual and technological communication.'
+        desc: 'The new standard in visual and technological communication.',
+        footer: '© 2026 PRISMETON. ALL RIGHTS RESERVED.'
     },
     'pt': {
         title: 'EM BREVE',
-        desc: 'O novo padrão em comunicação visual e tecnológica.'
+        desc: 'O novo padrão em comunicação visual e tecnológica.',
+        footer: '© 2026 PRISMETON. TODOS OS DIREITOS RESERVADOS.'
     }
 };
 
@@ -118,6 +121,7 @@ function applyTranslation(code) {
     
     document.getElementById('coming-soon-title').innerText = content.title;
     document.getElementById('coming-soon-desc').innerText = content.desc;
+    document.getElementById('footer-text').innerText = content.footer;
     document.documentElement.lang = finalCode;
 
     // Actualizar UI de botones
