@@ -135,28 +135,30 @@ function applyTranslation(code) {
 function setLanguage(code) {
     localStorage.setItem('user-lang', code);
     applyTranslation(code);
-    // Simular "dirección" en la URL sin recargar
-    window.history.pushState({}, '', `?lang=${code}`);
+    
+    // Cambiar la dirección de la URL a /es, /en o /pt
+    if (window.location.pathname !== `/${code}`) {
+        window.history.pushState({}, '', `/${code}`);
+    }
 }
 
 async function initLanguage() {
-    // 1. Prioridad: URL (?lang=es o similar)
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlLang = urlParams.get('lang');
+    // 1. Prioridad: Pathname (/es, /en, /pt)
+    const path = window.location.pathname.replace(/\//g, '').toLowerCase();
     
-    if (urlLang && translations[urlLang]) {
-        applyTranslation(urlLang);
+    if (translations[path]) {
+        applyTranslation(path);
         return;
     }
 
     // 2. Prioridad: Selección previa guardada
     const savedLang = localStorage.getItem('user-lang');
     if (savedLang && translations[savedLang]) {
-        setLanguage(savedLang); // Esto actualiza la URL también
+        setLanguage(savedLang); 
         return;
     }
 
-    // 3. Prioridad: Detección por IP (Ubicación real)
+    // 3. Prioridad: Detección por IP
     try {
         const response = await fetch('https://ipwho.is/');
         const data = await response.json();
@@ -167,7 +169,7 @@ async function initLanguage() {
             if (spanishCountries.includes(countryCode)) detected = 'es';
             else if (portugueseCountries.includes(countryCode)) detected = 'pt';
             
-            setLanguage(detected); // Fuerza la redirección visual en la URL
+            setLanguage(detected); 
             return;
         }
     } catch (e) {
