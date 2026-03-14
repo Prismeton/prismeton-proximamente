@@ -14,30 +14,34 @@
 body, html {
     width: 100%;
     height: 100%;
+    margin: 0;
+    padding: 0;
     overflow: hidden;
-    background-color: var(--bg-color);
+    background-color: #000;
 }
 
 #bg-canvas {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
+    width: 100vw;
+    height: 100dvh; /* Dynamic viewport height for mobile */
+    z-index: -1; /* Totalmente al fondo */
+    pointer-events: none; /* Que no interfiera con clics */
 }
 
 .main-container {
     position: relative;
-    z-index: 10;
+    z-index: 1;
     width: 100%;
-    height: 100vh;
+    height: 100dvh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    padding: 0 5%; /* Margen lateral fijo del 5% */
+    padding: 0 5%;
+    background: transparent; /* Asegurar que no tape el fondo */
 }
 
 .content-wrapper {
