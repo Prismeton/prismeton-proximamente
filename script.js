@@ -22,7 +22,7 @@ window.addEventListener('resize', () => {
 
 function initCanvas() {
     canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.height = Math.max(window.innerHeight, document.documentElement.scrollHeight);
     createParticles();
 }
 
