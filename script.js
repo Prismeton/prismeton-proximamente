@@ -143,22 +143,16 @@ function setLanguage(code) {
 }
 
 async function initLanguage() {
-    // 1. Prioridad: Pathname (/es, /en, /pt)
+    // 1. Prioridad Absoluta: Pathname exacto (/es, /en, /pt)
     const path = window.location.pathname.replace(/\//g, '').toLowerCase();
     
     if (translations[path]) {
         applyTranslation(path);
+        localStorage.setItem('user-lang', path); // Sincronizar preferencia
         return;
     }
 
-    // 2. Prioridad: Selección previa guardada
-    const savedLang = localStorage.getItem('user-lang');
-    if (savedLang && translations[savedLang]) {
-        setLanguage(savedLang); 
-        return;
-    }
-
-    // 3. Prioridad: Detección por IP
+    // 2. Si estamos en la raíz (/), la IP es la que manda
     try {
         const response = await fetch('https://ipwho.is/');
         const data = await response.json();
@@ -166,17 +160,27 @@ async function initLanguage() {
         if (data && data.success) {
             const countryCode = data.country_code;
             let detected = 'en';
+            
+            // Lógica: País manda sobre dispositivo
             if (spanishCountries.includes(countryCode)) detected = 'es';
             else if (portugueseCountries.includes(countryCode)) detected = 'pt';
             
+            console.log(`País detectado: ${countryCode} -> Idioma: ${detected}`);
             setLanguage(detected); 
             return;
         }
     } catch (e) {
-        console.warn('IP check failed');
+        console.warn('Detección por IP fallida, siguiendo con fallbacks.');
     }
 
-    // 4. Prioridad: Idioma del Navegador
+    // 3. Fallback: Preferencia guardada por el usuario
+    const savedLang = localStorage.getItem('user-lang');
+    if (savedLang && translations[savedLang]) {
+        setLanguage(savedLang); 
+        return;
+    }
+
+    // 4. Último recurso: Idioma del navegador
     const browserLang = (navigator.language || navigator.userLanguage).split('-')[0].toLowerCase();
     const finalBrowserLang = translations[browserLang] ? browserLang : 'en';
     setLanguage(finalBrowserLang);
