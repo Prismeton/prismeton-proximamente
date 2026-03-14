@@ -143,6 +143,7 @@ async function initLanguage() {
     // 1. Prioridad: URL (?lang=es o similar)
     const urlParams = new URLSearchParams(window.location.search);
     const urlLang = urlParams.get('lang');
+    
     if (urlLang && translations[urlLang]) {
         applyTranslation(urlLang);
         return;
@@ -151,7 +152,7 @@ async function initLanguage() {
     // 2. Prioridad: Selección previa guardada
     const savedLang = localStorage.getItem('user-lang');
     if (savedLang && translations[savedLang]) {
-        applyTranslation(savedLang);
+        setLanguage(savedLang); // Esto actualiza la URL también
         return;
     }
 
@@ -162,22 +163,21 @@ async function initLanguage() {
         
         if (data && data.success) {
             const countryCode = data.country_code;
-            if (spanishCountries.includes(countryCode)) {
-                applyTranslation('es');
-                return;
-            }
-            if (portugueseCountries.includes(countryCode)) {
-                applyTranslation('pt');
-                return;
-            }
+            let detected = 'en';
+            if (spanishCountries.includes(countryCode)) detected = 'es';
+            else if (portugueseCountries.includes(countryCode)) detected = 'pt';
+            
+            setLanguage(detected); // Fuerza la redirección visual en la URL
+            return;
         }
     } catch (e) {
         console.warn('IP check failed');
     }
 
-    // 4. Prioridad: Idioma del Dispositivo/Navegador
+    // 4. Prioridad: Idioma del Navegador
     const browserLang = (navigator.language || navigator.userLanguage).split('-')[0].toLowerCase();
-    applyTranslation(browserLang);
+    const finalBrowserLang = translations[browserLang] ? browserLang : 'en';
+    setLanguage(finalBrowserLang);
 }
 
 initLanguage();
