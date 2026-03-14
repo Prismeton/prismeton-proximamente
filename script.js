@@ -147,30 +147,36 @@ function setLanguage(code) {
 }
 
 async function initLanguage() {
-    console.log("Iniciando detección agresiva de ubicación...");
+    console.log("Iniciando detección de ubicación forzada...");
     
     const currentPath = window.location.pathname.replace(/\//g, '').toLowerCase();
     let countryCode = null;
 
-    // Intentar obtener la IP de múltiples fuentes para asegurar la detección
+    // Proveedores de detección de IP con timeout
+    const fetchWithTimeout = (url, timeout = 3000) => {
+        return Promise.race([
+            fetch(url).then(r => r.json()),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), timeout))
+        ]);
+    };
+
     try {
-        const response = await fetch(`https://ipwho.is/?_=${Date.now()}`);
-        const data = await response.json();
+        const data = await fetchWithTimeout(`https://ipwho.is/?_=${Date.now()}`);
         if (data && data.success) countryCode = data.country_code;
-    } catch (e) {}
-
-    if (!countryCode) {
+    } catch (e) {
+        console.warn("Intento 1 fallido, probando fallback...");
         try {
-            const response = await fetch('https://ipapi.co/json/').then(r => r.json());
-            countryCode = response.country_code;
-        } catch (e) {}
-    }
-
-    if (!countryCode) {
-        try {
-            const response = await fetch('https://freeipapi.com/api/json').then(r => r.json());
-            countryCode = response.countryCode;
-        } catch (e) {}
+            const data = await fetchWithTimeout('https://ipapi.co/json/');
+            countryCode = data.country_code;
+        } catch (e2) {
+            console.warn("Intento 2 fallido...");
+            try {
+                const data = await fetchWithTimeout('https://freeipapi.com/api/json');
+                countryCode = data.countryCode;
+            } catch (e3) {
+                console.error("No se pudo detectar la IP tras 3 intentos.");
+            }
+        }
     }
 
     if (countryCode) {
@@ -178,23 +184,24 @@ async function initLanguage() {
         if (spanishCountries.includes(countryCode)) detected = 'es';
         else if (portugueseCountries.includes(countryCode)) detected = 'pt';
         
-        console.log(`Ubicación detected: ${countryCode} -> Idioma: ${detected}`);
+        console.log(`IP Detectada: ${countryCode} | Idioma Asignado: ${detected}`);
 
-        // Si la ruta actual no es la que corresponde al país, REDIRIGIR
+        // SIEMPRE REDIRIGIR si la ruta no coincide con el país detectado
         if (currentPath !== detected) {
-            console.log(`>> Redireccionando de /${currentPath || 'raíz'} a /${detected}`);
+            console.log(`>> Forzando redirección inmediata: /${currentPath || 'raíz'} -> /${detected}`);
             setLanguage(detected);
             return;
         }
     }
 
-    // Si ya estamos en la ruta correcta o falló la detección IP
+    // Si ya estamos en la ruta correcta o si falló la detección IP
     if (translations[currentPath]) {
         applyTranslation(currentPath);
     } else {
-        // Fallback final: Idioma del navegador si estamos en la raíz y no hay IP
+        // Fallback final por navegador
         const browserLang = (navigator.language || navigator.userLanguage).split('-')[0].toLowerCase();
         const finalLang = translations[browserLang] ? browserLang : 'en';
+        console.log(`Usando fallback de navegador: ${finalLang}`);
         setLanguage(finalLang);
     }
 }
