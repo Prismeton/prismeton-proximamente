@@ -97,16 +97,19 @@ animate();
 const translations = {
     'es': {
         title: 'PRÓXIMAMENTE',
+        pageTitle: 'Prismeton - Proximamente',
         desc: 'El nuevo estándar en comunicación visual y tecnológica.',
         footer: '© 2026 PRISMETON. TODOS LOS DERECHOS RESERVADOS.'
     },
     'en': {
         title: 'COMING SOON',
+        pageTitle: 'Prismeton - Coming Soon',
         desc: 'The new standard in visual and technological communication.',
         footer: '© 2026 PRISMETON. ALL RIGHTS RESERVED.'
     },
     'pt': {
         title: 'EM BREVE',
+        pageTitle: 'Prismeton - Em Breve',
         desc: 'O novo padrão em comunicação visual e tecnológica.',
         footer: '© 2026 PRISMETON. TODOS OS DIREITOS RESERVADOS.'
     }
@@ -119,6 +122,7 @@ function applyTranslation(code) {
     const finalCode = translations[code] ? code : 'en';
     const content = translations[finalCode];
     
+    document.title = content.pageTitle;
     document.getElementById('coming-soon-title').innerText = content.title;
     document.getElementById('coming-soon-desc').innerText = content.desc;
     document.getElementById('footer-text').innerText = content.footer;
