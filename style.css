@@ -16,8 +16,10 @@ body, html {
     height: 100%;
     margin: 0;
     padding: 0;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto; /* Permite scroll vacío */
     background-color: #000;
+    touch-action: manipulation; /* Evita zoom por doble tap */
 }
 
 #bg-canvas {
@@ -25,23 +27,23 @@ body, html {
     top: 0;
     left: 0;
     width: 100vw;
-    height: 100dvh; /* Dynamic viewport height for mobile */
-    z-index: -1; /* Totalmente al fondo */
-    pointer-events: none; /* Que no interfiera con clics */
+    height: 100%;
+    z-index: 0; /* Capa base sobre el fondo del body */
+    pointer-events: none;
 }
 
 .main-container {
     position: relative;
-    z-index: 1;
+    z-index: 1; /* Sobre el canvas */
     width: 100%;
-    height: 100dvh;
+    min-height: 100.5vh; /* Un poco más de 100 para permitir el 'scroll vacío' */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    padding: 0 5%;
-    background: transparent; /* Asegurar que no tape el fondo */
+    padding: 3rem 5%;
+    background: transparent;
 }
 
 .content-wrapper {
