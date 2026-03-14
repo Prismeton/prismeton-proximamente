@@ -143,47 +143,46 @@ function setLanguage(code) {
 }
 
 async function initLanguage() {
-    // 1. Prioridad Absoluta: Pathname exacto (/es, /en, /pt)
     const path = window.location.pathname.replace(/\//g, '').toLowerCase();
     
+    // Si la URL ya tiene /es, /en o /pt, respetarla (no hacer nada más)
     if (translations[path]) {
         applyTranslation(path);
-        localStorage.setItem('user-lang', path); // Sincronizar preferencia
         return;
     }
 
-    // 2. Si estamos en la raíz (/), la IP es la que manda
+    // SI ESTÁ EN LA RAÍZ (/): Forzar detección por IP
+    console.log("Detectando ubicación para redirección...");
+    
+    let countryCode = null;
+
     try {
-        const response = await fetch('https://ipwho.is/');
-        const data = await response.json();
-        
-        if (data && data.success) {
-            const countryCode = data.country_code;
-            let detected = 'en';
-            
-            // Lógica: País manda sobre dispositivo
-            if (spanishCountries.includes(countryCode)) detected = 'es';
-            else if (portugueseCountries.includes(countryCode)) detected = 'pt';
-            
-            console.log(`País detectado: ${countryCode} -> Idioma: ${detected}`);
-            setLanguage(detected); 
-            return;
+        // Intento 1: ipwho.is
+        const res1 = await fetch('https://ipwho.is/').then(r => r.json());
+        if (res1.success) countryCode = res1.country_code;
+        else {
+            // Intento 2: ipapi.co (fallback)
+            const res2 = await fetch('https://ipapi.co/json/').then(r => r.json());
+            countryCode = res2.country_code;
         }
     } catch (e) {
-        console.warn('Detección por IP fallida, siguiendo con fallbacks.');
+        console.warn("Detección IP fallida:", e);
     }
 
-    // 3. Fallback: Preferencia guardada por el usuario
-    const savedLang = localStorage.getItem('user-lang');
-    if (savedLang && translations[savedLang]) {
-        setLanguage(savedLang); 
+    if (countryCode) {
+        let detected = 'en';
+        if (spanishCountries.includes(countryCode)) detected = 'es';
+        else if (portugueseCountries.includes(countryCode)) detected = 'pt';
+        
+        console.log(`Redirigiendo a /${detected} basado en país: ${countryCode}`);
+        setLanguage(detected);
         return;
     }
 
-    // 4. Último recurso: Idioma del navegador
+    // Si todo lo anterior falla, usar idioma del navegador
     const browserLang = (navigator.language || navigator.userLanguage).split('-')[0].toLowerCase();
-    const finalBrowserLang = translations[browserLang] ? browserLang : 'en';
-    setLanguage(finalBrowserLang);
+    const finalLang = translations[browserLang] ? browserLang : 'en';
+    setLanguage(finalLang);
 }
 
 initLanguage();
