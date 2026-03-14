@@ -1,0 +1,129 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Outfit', sans-serif;
+}
+
+:root {
+    --bg-color: #000000;
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0a0;
+}
+
+body, html {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--bg-color);
+}
+
+#bg-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.main-container {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 0 5%; /* Margen lateral fijo del 5% */
+}
+
+.content-wrapper {
+    width: 100%;
+    text-align: center;
+}
+
+h1 {
+    font-size: clamp(2rem, 6.8vw, 7rem); /* 6.8vw es un valor seguro para que 13 letras quepan en el 90% del ancho */
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+    margin-bottom: 2rem;
+    color: var(--text-primary);
+}
+
+.description {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    color: var(--text-secondary);
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 1.5;
+}
+
+footer {
+    position: absolute;
+    bottom: 2.5rem;
+    width: 100%;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    opacity: 0.5;
+}
+
+.lang-switcher {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    display: flex;
+    gap: 1.5rem;
+    z-index: 100;
+}
+
+.lang-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+    padding: 0.5rem;
+}
+
+.lang-btn:hover, .lang-btn.active {
+    color: var(--text-primary);
+}
+
+@media (max-width: 480px) {
+    .lang-switcher {
+        top: 1.5rem;
+        right: 50%;
+        transform: translateX(50%);
+        width: 100%;
+        justify-content: center;
+        gap: 1rem;
+    }
+    
+    .main-container {
+        padding: 0 5%; 
+    }
+    
+    h1 {
+        font-size: clamp(3rem, 15.5vw, 5rem); 
+    }
+
+    .description {
+        max-width: 90%; 
+        font-size: 0.9rem;
+    }
+
+    footer {
+        bottom: 2rem;
+        font-size: 0.65rem;
+    }
+}
