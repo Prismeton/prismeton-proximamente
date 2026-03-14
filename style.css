@@ -70,12 +70,13 @@ h1 {
 
 footer {
     position: absolute;
-    bottom: 2.5rem;
+    bottom: calc(2.5rem + env(safe-area-inset-bottom, 0px));
     width: 100%;
     text-align: center;
     color: var(--text-secondary);
     font-size: 0.7rem;
     opacity: 0.5;
+    z-index: 20;
 }
 
 .lang-switcher {
@@ -128,7 +129,8 @@ footer {
     }
 
     footer {
-        bottom: 2rem;
-        font-size: 0.65rem;
+        bottom: calc(3rem + env(safe-area-inset-bottom, 0px)); /* Más espacio para iPhones con barra inferior */
+        font-size: 0.6rem;
+        opacity: 0.4;
     }
 }
