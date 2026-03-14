@@ -60,6 +60,12 @@ h1 {
     white-space: nowrap;
     margin-bottom: 2rem;
     color: var(--text-primary);
+    min-height: 1.1em; /* Estabiliza el bloque de altura */
+}
+
+/* Ajuste específico para Portugués para que EM BREVE tenga impacto visual similar */
+.lang-pt h1 {
+    font-size: clamp(2.5rem, 10vw, 9rem);
 }
 
 .description {
@@ -121,8 +127,12 @@ footer {
     }
     
     h1 {
-        font-size: clamp(2.2rem, 11vw, 4rem); 
+        font-size: clamp(2rem, 10vw, 4rem); 
         margin-bottom: 1.5rem;
+    }
+
+    .lang-pt h1 {
+        font-size: clamp(2.8rem, 15vw, 4.5rem); /* Proporcionalmente más grande en móvil */
     }
 
     .description {

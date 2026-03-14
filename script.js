@@ -124,7 +124,8 @@ function applyTranslation(code) {
     document.getElementById('footer-text').innerText = content.footer;
     document.documentElement.lang = finalCode;
 
-    // Actualizar UI de botones
+    // Actualizar UI de botones y body class
+    document.body.className = `lang-${finalCode}`;
     document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
     const activeBtn = document.getElementById(`btn-${finalCode}`);
     if (activeBtn) activeBtn.classList.add('active');
